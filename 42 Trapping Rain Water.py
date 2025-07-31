@@ -9,7 +9,6 @@ class Solution_1:
 
         capacity = 0
         for h in range(min_h,max_h+1):
-            walled = False
             last_wall = -1
             for x in range(max_x):
                 is_wall = height[x] >= h
@@ -21,8 +20,6 @@ class Solution_1:
     
 class Solution_2:
     def trap(self, height: List[int]) -> int:
-        max_h = max(height)
-        min_h = min(height)
         max_x = len(height)
 
         x = 0
@@ -58,7 +55,6 @@ class Solution_2:
 class Solution:
     def trap(self, height: List[int]) -> int:
         max_x = len(height)
-
         x = 0
         capacity = 0
         while x < max_x-1:
