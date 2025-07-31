@@ -12,7 +12,6 @@ class Solution:
         got_dot = False
         got_exp = False
         last_was_exp = False
-        last_was_dot = False
         got_num = False
         got_exp_num = False
         is_first_char = True
