@@ -1,3 +1,4 @@
+from array import array
 from typing import List
 
 
@@ -55,6 +56,9 @@ class Solution_2:
 class Solution:
     def trap(self, height: List[int]) -> int:
         max_x = len(height)
+        max_h = max(height)
+        if height.index(max_h) < max_x/2:
+            height.reverse()
         x = 0
         capacity = 0
         while x < max_x-1:
@@ -69,3 +73,23 @@ class Solution:
                     break
                 capacity += left_h - height[y]
         return capacity      
+
+from array import array
+class Solution_4:
+    def trap(self, height: List[int]) -> int:
+        max_x = len(height)
+        heights = array('i', height)
+        x = 0
+        capacity = 0
+        while x < max_x-1:
+            next_max_h = max(heights[x+1:])
+            if not next_max_h:
+                return capacity
+            left_h = min(next_max_h, heights[x])
+            
+            for y in range(x+1, max_x):
+                if heights[y] >= left_h:
+                    x = y
+                    break
+                capacity += left_h - heights[y]
+        return capacity     
