@@ -20,7 +20,8 @@ class Solution:
 
         max_left = min([x[0] for x in rectangles])
         _, max_down, max_right, _ = rectangles[-1]
-        max_up = max([x[3] for x in rectangles])
+#        max_up = max([x[3] for x in rectangles])
+        max_up = rectangles[0][3]
 
         return can_fill2(rectangles, max_left, max_down, max_right,max_up)
 
@@ -31,11 +32,7 @@ def can_fill2(rectangles, max_left, max_down, max_right, max_up) -> bool:
     while need_slot and rectangles:
         r_l, r_d, r_r, r_u = rectangles.pop()
 
-        if need_slot.right != r_r: 
-            return False
-        if need_slot.top != r_d:
-            return False
-        if need_slot.left > r_l:
+        if need_slot.right != r_r or need_slot.top != r_d or need_slot.left > r_l or r_u > max_up:
             return False
 
         if r_u < max_up: #not filling to top
