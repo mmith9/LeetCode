@@ -8,32 +8,38 @@ class Solution:
         board 9x9
         number 1-9 in each row, each column, each 3x3 sub box
         """
+        self.board = board
+        self.spaces = []
+        self.cols = [[] for _ in range(9)]
+        self.groups = [[] for _ in range(9)]
+        for x in range(9):
+            for y in range(9):
+                num = board[y][x]
+                if num == '.':
+                    self.spaces.append((x,y))
+                else:
+                    self.groups[y//3*3 + x//3].append(num)
+                    self.cols[x].append(num)
 
-        try_solving(board)
+        self.try_solving(0)
 
-def try_solving(board) -> bool:
-    for y, row in enumerate(board):
-        if '.' in row:
-            x = row.index('.')
-            possible_nums = find_possible_nums(board, y, x)
-            for num in possible_nums:
-                board[y][x] = num
-                if try_solving(board):
-                    return True
-            else:
-                board[y][x] = '.'
-                return False        
-    return True
+    def try_solving(self, pos) -> bool:
+        if pos >= len(self.spaces):
+            return True
+        x,y = self.spaces[pos]
+        group = y//3 *3 + x//3
+        for num in nums_1_to_9:
+            if num in self.cols[x] or num in self.groups[group] or num in self.board[y]:
+                continue
+            self.board[y][x] = num
+            self.groups[group].append(num)
+            self.cols[x].append(num)
+            if self.try_solving(pos+1):
+                return True
+            self.groups[group].pop()
+            self.cols[x].pop()
 
+        self.board[y][x] = '.'
+        return False
+    
 nums_1_to_9 = set(['1','2','3','4','5','6','7','8','9'])
-def find_possible_nums(board, row, col) -> Set[str]:
-    nums = nums_1_to_9.difference(board[row])
-    for y in range(9):
-        nums.difference_update(board[y][col])
-    sub_row = int(row/3) *3
-    sub_col = int(col/3) *3
-    for y in range(sub_row, sub_row+3):
-        nums.difference_update(board[y][sub_col:sub_col+3])
-    
-    return nums
-    
