@@ -9,8 +9,7 @@ class Solution:
             if pos_s>max_s or pos_t>max_t or max_s - pos_s < max_t - pos_t:
                 return 0
             
-            letter = t[pos_t]
-            pos_l = s[pos_s:].find(letter)
+            pos_l = s[pos_s:].find(t[pos_t])
             if pos_l <0:
                 return 0
             
