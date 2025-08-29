@@ -1,63 +1,95 @@
 from typing import List
-class Solution:
+#textdistance version
+class Solution_1:
     def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
-        if len(beginWord) != len(endWord):
-            return 0
         uwords = set(wordList)
         if endWord not in uwords:
             return 0
         uwords.add(beginWord)
-        hops = {word:set() for word in uwords}\
-        
-        chop = len(endWord) //2
+        uwords.remove(endWord)
 
-        def prep_hops(word):
-            uwords.remove(word)
-            for hop in uwords:
-                if word[chop:] != hop[chop:] and word[:chop] != hop[:chop]:
-                    continue
-                dist = 0
-                for a,b in zip(word, hop):
-                    if a!=b:
-                        dist+=1
-                        if dist>1:
-                            break
-                if dist==1:
-                    hops[word].add(hop)
-
-        word_map = {}
-        words_to_map = []
-        mapped_words = []
-
-        def map_word(a):
-            if a in mapped_words:
-                return            
-            mapped_words.append(a)
-
-            if a in uwords:
-                prep_hops(a)
-            if a not in hops:
-                return
-            
-            cur_dist = word_map[a] +1
-
-            for hop in hops[a]:
-                if hop in word_map:
-                    word_map[hop] = min(word_map[hop], cur_dist)
-                else:
-                    word_map[hop] = cur_dist
-                if hop not in mapped_words:
-                    words_to_map.append(hop)
-
-        word_map[endWord] = 1
-        words_to_map = [endWord]
-        while words_to_map:
-            word = words_to_map.pop(0)
-            if word == beginWord:
-                break
-            map_word(word)
-
-        if beginWord in word_map:
-            return word_map[beginWord]
+        queue = set([endWord])
+        level = 2
+        while queue:
+            next_queue = set()
+            for cur_word in queue:
+                used_words = set()
+                for word in uwords:
+                    distance = 0
+                    for a,b in zip(cur_word, word):
+                        if a!=b:
+                            distance+=1
+                            if distance >1:
+                                break
+                    if distance == 1:
+                        if word == beginWord:
+                            return level
+                        next_queue.add(word)
+                        used_words.add(word)
+                uwords.difference_update(used_words)
+            queue = next_queue
+            level += 1
+        return 0
+    
+# cycle letter version
+class Solution_2:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        uwords = set(wordList)
+        if endWord not in uwords:
+            return 0
+        uwords.add(beginWord)
+        uwords.remove(endWord)
+        lens = len(beginWord)
+        queue = set([endWord])
+        level = 2
+        alphabet = [chr(x) for x in range(ord('a'), ord('z')+1)]
+        while queue:
+            next_queue = set()
+            for cur_word in queue:
+                for pos in range(lens):
+                    left = cur_word[:pos]
+                    right = cur_word[pos+1:]
+                    for letter in alphabet:
+                        if f'{left}{letter}{right}' in uwords:
+                            if f'{left}{letter}{right}' == beginWord:
+                                return level
+                            next_queue.add(f'{left}{letter}{right}')
+            uwords.difference_update(next_queue)
+            queue = next_queue
+            level += 1
         return 0
 
+# pattern solution
+from collections import defaultdict
+from typing import List
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:   
+        uwords = set(wordList)
+        if endWord not in uwords:
+            return 0
+        uwords.add(beginWord)
+        lens = len(beginWord)
+        queue = set([endWord])
+        level = 2
+
+        patterns = defaultdict(list)
+        for word in uwords:
+            for x in range(lens):
+                pattern = f'{word[:x]}*{word[x+1:]}'
+                patterns[word].append(pattern)
+                patterns[pattern].append(word)
+        uwords.remove(endWord)
+
+        while queue:
+            next_queue = set()
+            for cur_word in queue:
+                for pattern in patterns[cur_word]:
+                    for next_word in patterns[pattern]:
+                        if next_word in uwords:
+                            if next_word == beginWord:
+                                return level
+                            next_queue.add(next_word)
+            uwords.difference_update(next_queue)
+            queue = next_queue
+            level += 1
+        return 0
