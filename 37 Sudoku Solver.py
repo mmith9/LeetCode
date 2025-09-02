@@ -30,7 +30,7 @@ class Solution:
                     columns[x][num] = False
                     rows[y][num] = False
 
-#        nums_1_to_9 = [7,6,5,1,3,8,4,2,9] 
+#        nums_1_to_9 = [7,6,5,1,3,8,4,2,9] # can be as afast as 6ms if sorting is off
 #        nums_1_to_9 = [7,8,9,1,2,3,4,5,6]
         nums_1_to_9 = [1,2,3,4,5,6,7,8,9]
         nums_1_to_9.sort(key=lambda x:nums_c[x])
