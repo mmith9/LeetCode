@@ -40,7 +40,7 @@ class Solution:
             cur_ops = 0
 
             if bucket < last_bucket:
-                bucket_max = 2**(bucket*2)
+                bucket_max = pow4[bucket]
                 cur_ops += bucket*(bucket_max - a)
                 a = bucket_max
                 bucket += 1
