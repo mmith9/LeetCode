@@ -5,17 +5,18 @@ class Solution:
             return s
 
         def find_pali():
-            rend = len(s); lend = rend //2; xor_l = 0; xor_r = 0
+            rend = len(s); lend = rend //2; 
             odd = ord(s[lend]) if rend % 2 == 1 else 0
             rstart = lend+1 if odd else lend
 
-            for letter in s[:lend]:
-                xor_l ^= ord(letter)
-            for letter in s[rstart:]:
-                xor_r ^= ord(letter)
+            xors = 0
+            for byt in [ord(x) for x in s]:
+                xors ^= byt
+            if odd:
+                xors ^= odd
 
             while True:
-                if xor_r == xor_l:
+                if not xors:
                     if s[:lend] == s[rstart:rend][::-1]:
                         return lend + rstart
                 
@@ -23,15 +24,15 @@ class Solution:
                 discarded = ord(s[rend])
                 if odd:
                     rstart -= 1
-                    xor_r ^= odd ^ discarded
+                    xors ^= odd ^ discarded
                     odd = 0
                 else:
                     lend -= 1
                     odd = ord(s[lend])
-                    xor_l ^= odd
-                    xor_r ^= discarded
+                    xors ^= odd ^ discarded
 
         return s[find_pali():][::-1] + s
+
 
 # blitz using sum
 class Solution:
@@ -40,15 +41,14 @@ class Solution:
             return s
 
         def find_pali():
-            rend = len(s)
-            lend = rend //2
-            sum_l = sum([ord(x) for x in s[:lend]])
+            rend = len(s); lend = rend //2
             odd = ord(s[lend]) if rend % 2 == 1 else 0
             rstart = lend+1 if odd else lend
-            sum_r = sum([ord(x) for x in s[rstart:]])
+
+            suma = sum([ord(x) for x in s[:lend]]) - sum([ord(x) for x in s[rstart:]])
 
             while True:
-                if sum_l == sum_r:
+                if not suma:
                     if s[:lend] == s[rstart:rend][::-1]:
                         return lend + rstart
                 
@@ -56,13 +56,12 @@ class Solution:
                 discarded = ord(s[rend])
                 if odd:
                     rstart -= 1
-                    sum_r += odd - discarded
+                    suma += discarded - odd
                     odd = 0
                 else:
                     lend -= 1
                     odd = ord(s[lend])
-                    sum_l -= odd
-                    sum_r -= discarded
+                    suma += discarded - odd
 
         return s[find_pali():][::-1] + s
     

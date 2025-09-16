@@ -25,6 +25,8 @@ class Solution:
         return [[x,y] for x,y in pairs if x!=y]
 
 # search by looking for sub-palindromes in a word, beats 66%
+from functools import lru_cache
+from typing import List
 class Solution:
     def palindromePairs(self, words: List[str]) -> List[List[int]]:
         pairs = set()
@@ -37,17 +39,16 @@ class Solution:
         @lru_cache(maxsize=None)
         def sub_pali_left(s:str) -> List[str]:
             result = [s]
-            rend = len(s); lend = rend //2; xor_l = 0; xor_r = 0
+            rend = len(s); lend = rend //2; 
             odd = ord(s[lend]) if rend % 2 == 1 else 0
             rstart = lend+1 if odd else lend
-
-            for letter in s[:lend]:
-                xor_l ^= ord(letter)
-            for letter in s[rstart:]:
-                xor_r ^= ord(letter)
+            xors = 0
+            for byt in [ord(letter) for letter in s]:
+                xors ^= byt
+            xors ^= odd
 
             while rstart > 0:
-                if xor_r == xor_l:
+                if not xors:
                     if s[:lend] == s[rstart:rend][::-1]:
                         result.append(s[rend:])
                 
@@ -55,13 +56,12 @@ class Solution:
                 discarded = ord(s[rend])
                 if odd:
                     rstart -= 1
-                    xor_r ^= odd ^ discarded
+                    xors ^= odd ^ discarded
                     odd = 0
                 else:
                     lend -= 1
                     odd = ord(s[lend])
-                    xor_l ^= odd
-                    xor_r ^= discarded
+                    xors ^= odd ^ discarded
 
             return result
 
