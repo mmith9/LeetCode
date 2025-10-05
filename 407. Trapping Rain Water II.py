@@ -11,9 +11,10 @@ class Solution:
         visited += [[True]* lenx]
         heap = []
 
-        for x in range(lenx):
-            heap.append((heightMap[0][x],x,0))
-            heap.append((heightMap[max_y][x],x,max_y))
+        for x,h in enumerate(heightMap[0]):
+            heap.append((h,x,0))
+        for x,h in enumerate(heightMap[max_y]):
+            heap.append((h,x,max_y))
         for y in range(1,max_y):
             heap.append((heightMap[y][0],0,y))
             heap.append((heightMap[y][max_x],max_x,y))
