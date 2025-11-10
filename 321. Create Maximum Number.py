@@ -4,6 +4,55 @@ class Solution:
     def maxNumber(self, nums1: List[int], nums2: List[int], k: int) -> List[int]:
         num1 = ''.join(str(num) for num in nums1) 
         num2 = ''.join(str(num) for num in nums2) 
+        best = (num1+num2)[:k]
+        lens1=len(nums1); lens2 = len(nums2)
+        
+        @lru_cache(maxsize = None)
+        def rec(c1:int, c2:int, pos:int, greater:bool) -> str:
+            if pos == k:
+                return ''
+            nonlocal best
+            res1 = ''
+            res2 = ''
+
+            chop = lens1-c1+lens2-c2-k+pos+1
+            if chop <=0:
+                return ''
+            digi1 = max(num1[c1:c1+chop]) if c1 < lens1 else ''
+            digi2 = max(num2[c2:c2+chop]) if c2 < lens2 else ''
+
+            digit = max(digi1, digi2)
+            if not digit:
+                return ''
+                
+            if not greater and best[pos] > digit:
+                return ''
+            
+            if digi1 == digit:
+                idx = num1.find(digit, c1)
+                res1 = rec(idx+1, c2, pos+1, greater or best[pos] < digit)
+
+            if digi2 == digit:
+                idx = num2.find(digit, c2)
+                res2 = rec(c1, idx+1, pos+1, greater or best[pos] < digit)
+
+            if res1>res2:
+                return digit+res1
+            else:
+                return digit+res2
+
+        res = rec(0,0,0, False)
+        
+        return [int(x) for x in res]
+
+
+
+from functools import lru_cache
+from typing import List
+class Solution:
+    def maxNumber(self, nums1: List[int], nums2: List[int], k: int) -> List[int]:
+        num1 = ''.join(str(num) for num in nums1) 
+        num2 = ''.join(str(num) for num in nums2) 
         best = (num1+num2)[:k]; stack = ''
         lens1=len(nums1); lens2 = len(nums2)
         
