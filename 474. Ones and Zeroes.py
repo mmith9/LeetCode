@@ -1,7 +1,80 @@
-from functools import lru_cache
+from collections import defaultdict
 from typing import List
 
-#optimized dp 99%
+# BLITZ, beats most c++ implemenations on leetcode
+class Solution:
+    def findMaxForm(self, strs: List[str], m: int, n: int) -> int:
+        singletons = 0; buckets = defaultdict(list); lens = len(strs)
+        for text in strs:
+            buckets[len(text)].append(text.count('0'))
+
+        #greedy grab all string of size 1 if can 
+        for zeros in buckets[1]:
+            if zeros:
+                if m>0:
+                    singletons +=1; m -=1
+            elif n>0:
+                singletons +=1; n -=1
+        lens -= len(buckets[1])
+        buckets.pop(1, None)
+
+        dp = defaultdict(int)
+        dp[(m,n)]=0; curmax = 0
+
+        for length in sorted(buckets.keys()):
+            for zeros in buckets[length]:
+                ones = length - zeros
+                lens -=1
+                for (prevm, prevn),v in dp.copy().items():
+                    if (prevm+prevn)//length + v <= curmax or v+lens < curmax:
+                        dp.pop((prevm, prevn))
+                        continue
+
+                    newm, newn = prevm - zeros, prevn - ones
+                    if newm >= 0 and newn >= 0 and v >= dp[(newm, newn)]:
+                        dp[(newm, newn)] = v + 1
+                        if v >= curmax:
+                            curmax = v+1
+
+        return curmax + singletons
+
+
+class Solution:
+    def findMaxForm(self, strs: List[str], m: int, n: int) -> int:
+        got = 0; idx=0
+        strs.sort(key=lambda x:len(x))
+        #greedy grab all string of size 1 if can
+        for text in strs:
+            if len(text)!=1:
+                break
+            idx+=1 #consume
+            if text == '1':
+                if n>0:
+                    got +=1; n -=1
+            elif m>0:
+                got +=1; m -=1
+
+        limit = m+n; dp = {(0,0): 0}
+        for text in strs[idx:]:
+            if len(text) > limit:
+                break
+            zeros = text.count('0')
+            ones = len(text) - zeros
+            if zeros>m or ones>n:
+                continue
+
+            newdp = {}
+            for (prevz, prevo),v in dp.items():
+                newz, newo = prevz + zeros, prevo + ones
+                if newz <= m and newo <= n:
+                    oldv = dp.get((newz, newo), 0)
+                    if v+1>oldv:
+                        newdp[(newz, newo)] = v + 1
+            dp.update(newdp)
+
+        return max(dp.values()) + got
+
+#optimized dp with set 99%
 class Solution:
     def findMaxForm(self, strs: List[str], m: int, n: int) -> int:
         pairs = []; got = 0
