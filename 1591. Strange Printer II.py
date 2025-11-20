@@ -1,3 +1,59 @@
+from collections import defaultdict
+from typing import Dict, List
+
+#proper version with blocking colors management and color scan fast resume.
+# and it's somehow slower than plain bruteforce :/ because sorting by size is an actual wrecking ball here
+class Solution:
+    def isPrintable(self, targetGrid: List[List[int]]) -> bool:
+        #color rectangle: list[up,right,down,left]
+        colors:Dict[int, List] = {}
+        for r, row in enumerate(targetGrid):
+            for c, color in enumerate(row):
+                if color not in colors:
+                    colors[color] = [r,c,r,c]
+                else:
+                    _,right,down,left = colors[color]
+                    if right < c:
+                        colors[color][1] = c
+                    if down<r:
+                        colors[color][2] = r
+                    if left>c:
+                        colors[color][3] = c
+                    #up no need to check as it's downscan
+
+        queue = list(colors.keys())
+        queue.sort(key=lambda x:(colors[x][2]-colors[x][0]+1)*(colors[x][1]-colors[x][3]+1))
+        printed = set([0])
+        blocker = defaultdict(int); resumerow = defaultdict(int); blockers = set()
+        
+        def is_printable(color:int):
+            up,right,down,left = colors[color]
+            rownum = resumerow[color]
+            for row in targetGrid[up+rownum:down+1]:
+                for c in row[left:right+1]:
+                    if c!=color and c not in printed:
+                        resumerow[color] = rownum
+                        blocker[color] = c
+                        blockers.add(c)
+                        return False
+                rownum +=1
+            printed.add(color)
+            blocker[color] = 0
+            return True
+
+        while queue:
+            for color in queue.copy():
+                if blocker[color] in printed and is_printable(color):
+                    queue.remove(color)
+                    if color in blockers:
+                        blockers.discard(color)
+                        break
+            else: #nothing printable found or exhaused the list
+                return not bool(queue)
+
+        return True
+
+
 from typing import Dict, Iterator, List
 #fun version using generators as semaphors for colors
 class Solution:
