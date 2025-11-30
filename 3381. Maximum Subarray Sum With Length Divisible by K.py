@@ -5,18 +5,17 @@ from typing import List
 class Solution:
     def maxSubarraySum(self, nums: List[int], k: int) -> int:
         sums = [0 for _ in range(k)]
-        sm = sum(nums[:k]); sums[0] = sm; res = sm
-        idx = 0
+        sm = sum(nums[:k])
+        sums[0] = sm; res = sm; k1=k-1; idx = 0
+
         for drop, add in zip(nums[:-k], nums[k:]):
-            idx+=1
-            if idx >= k:
-                idx -= k
+            idx = idx+1 if idx < k1 else 0
             sm += add - drop
 
             if sums[idx] < 0:
                 new_sum = sm
             else:
-                new_sum = sm+sums[idx]
+                new_sum = sm + sums[idx]
             if new_sum > res:
                 res = new_sum
             sums[idx] = new_sum
