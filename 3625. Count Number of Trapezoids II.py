@@ -47,7 +47,6 @@ class Solution:
                 for key, value in edgesl.items():
                     cnt += value
                     par[key].append(value)
-                cnt = sum(edgesl.values())
                 tot_t += cnt
                 tot_dif += cnt*(cnt-1)
                               
