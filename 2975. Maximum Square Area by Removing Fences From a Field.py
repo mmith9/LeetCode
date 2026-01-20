@@ -2,44 +2,39 @@ from itertools import combinations
 from typing import List, Set
 
 #funny but ultimately slower solution with generators
-from heapq import heappop, heappush
+from heapq import heapify, heappop, heappush
 from itertools import combinations
 from typing import List, Set
 
 class Solution:
     def maximizeSquareArea(self, m: int, n: int, hFences: List[int], vFences: List[int]) -> int:
-        hFences.extend([1,m]); hFences.sort()
-        vFences.extend([1,n]); vFences.sort()
 
-        def descending_diffs(nums):
-            n1 = len(nums) -1
-            heap = []
-
-            for i in range(n1):
-                neg_diff = nums[i] - nums[n1] 
-                heappush(heap, (neg_diff, i, n1))
+        def descending_diffs(nums, last_f):
+            nums.append(1)
+            nums.sort()
+            lenn = len(nums)
+            heap = [(f - last_f, idx, lenn) for idx, f in enumerate(nums)]
+            heapify(heap)
 
             while heap:
                 neg_diff, i, j = heappop(heap)
                 yield -neg_diff
+                j -= 1
+                if j > i:
+                    heappush(heap, (nums[i] - nums[j], i, j))
 
-                if j - 1 > i:
-                    neg_diff = nums[i] - nums[j - 1]
-                    heappush(heap, (neg_diff, i, j - 1))
-
-        gen_h = descending_diffs(hFences)
-        gen_v = descending_diffs(vFences)
+        gen_h = descending_diffs(hFences, m)
+        gen_v = descending_diffs(vFences, n)
         h = next(gen_h)
         v = next(gen_v)
 
         try:
-            while True:
-                if v == h:
-                    return (h*h) % 1_000_000_007    
+            while h != v:
                 if v>h:
                     v = next(gen_v)
                 else:
                     h = next(gen_h)
+            return (h*h) % 1_000_000_007                        
         except StopIteration:
             return -1
 
